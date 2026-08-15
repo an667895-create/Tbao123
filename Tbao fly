@@ -1,0 +1,51 @@
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local flying = false
+local speed = 60
+local bv, bg
+
+local function fly()
+	flying = not flying
+	local char = player.Character
+	if not char then return end
+
+	local root = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not root or not hum then return end
+
+	if flying then
+		bv = Instance.new("BodyVelocity", root)
+		bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+
+		bg = Instance.new("BodyGyro", root)
+		bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+
+		hum.PlatformStand = true
+	else
+		if bv then bv:Destroy() end
+		if bg then bg:Destroy() end
+		hum.PlatformStand = false
+	end
+end
+
+UIS.InputBegan:Connect(function(input, processed)
+	if not processed and input.KeyCode == Enum.KeyCode.F then
+		fly()
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if not flying or not bv or not bg then return end
+
+	local cam = workspace.CurrentCamera
+	local move = Vector3.zero
+
+	if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
+	if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
+	if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
+	if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
+	if UIS:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.yAxis end
+	if UIS:IsKeyDown(Enum
