@@ -1,0 +1,114 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "LightningMenu"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromOffset(280, 150)
+frame.Position = UDim2.new(0.5, -140, 0, 40)
+frame.BackgroundColor3 = Color3.fromRGB(35,35,40)
+frame.Active = true
+frame.Parent = gui
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0,12)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,45)
+title.BackgroundTransparency = 1
+title.Text = "⚡ CẢNH BÁO SÉT"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextSize = 22
+title.Font = Enum.Font.GothamBold
+title.Active = true
+title.Parent = frame
+
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1,-20,0,40)
+status.Position = UDim2.fromOffset(10,45)
+status.BackgroundTransparency = 1
+status.Text = "🟢 Đang theo dõi..."
+status.TextColor3 = Color3.new(1,1,1)
+status.TextSize = 18
+status.Font = Enum.Font.Gotham
+status.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1,-20,0,40)
+button.Position = UDim2.fromOffset(10,100)
+button.Text = "🔔 CẢNH BÁO: BẬT"
+button.TextSize = 17
+button.Font = Enum.Font.GothamBold
+button.TextColor3 = Color3.new(1,1,1)
+button.BackgroundColor3 = Color3.fromRGB(0,170,80)
+button.Parent = frame
+
+Instance.new("UICorner", button).CornerRadius = UDim.new(0,8)
+
+local enabled = true
+
+button.MouseButton1Click:Connect(function()
+	enabled = not enabled
+
+	if enabled then
+		button.Text = "🔔 CẢNH BÁO: BẬT"
+		button.BackgroundColor3 = Color3.fromRGB(0,170,80)
+		status.Text = "🟢 Đang theo dõi..."
+	else
+		button.Text = "🔕 CẢNH BÁO: TẮT"
+		button.BackgroundColor3 = Color3.fromRGB(170,50,50)
+		status.Text = "⚪ Đã tắt cảnh báo"
+	end
+end)
+
+local dragging = false
+local dragStart
+local startPos
+
+title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
+		local delta = input.Position - dragStart
+
+		frame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+workspace:GetAttributeChangedSignal("LightningIncoming"):Connect(function()
+	if enabled and workspace:GetAttribute("LightningIncoming") == true then
+		status.Text = "⚡ SẮP CÓ SÉT! ⚡"
+
+		task.delay(3,function()
+			if enabled then
+				status.Text = "🟢 Đang theo dõi..."
+			end
+		end)
+	end
+end)
