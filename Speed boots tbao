@@ -1,0 +1,68 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,220,0,170)
+frame.Position = UDim2.new(.5,-110,.5,-85)
+frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,35)
+title.BackgroundTransparency = 1
+title.Text = "⚡ CHẠY NHANH"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextScaled = true
+title.Parent = frame
+
+local speedBox = Instance.new("TextBox")
+speedBox.Size = UDim2.new(.8,0,0,40)
+speedBox.Position = UDim2.new(.1,0,0,45)
+speedBox.Text = "100"
+speedBox.PlaceholderText = "Nhập tốc độ"
+speedBox.TextScaled = true
+speedBox.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(.8,0,0,45)
+button.Position = UDim2.new(.1,0,0,95)
+button.Text = "CHẠY NHANH: TẮT"
+button.TextScaled = true
+button.Parent = frame
+
+local enabled = false
+local normalSpeed = 16
+
+local function update()
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		local speed = tonumber(speedBox.Text) or 100
+		hum.WalkSpeed = enabled and speed or normalSpeed
+	end
+end
+
+button.MouseButton1Click:Connect(function()
+	enabled = not enabled
+	button.Text = enabled and "CHẠY NHANH: BẬT" or "CHẠY NHANH: TẮT"
+	update()
+end)
+
+speedBox.FocusLost:Connect(function()
+	if enabled then
+		update()
+	end
+end)
+
+player.CharacterAdded:Connect(function()
+	task.wait(1)
+	update()
+end)
+
+update()
