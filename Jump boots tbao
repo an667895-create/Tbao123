@@ -1,0 +1,53 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,180,0,110)
+frame.Position = UDim2.new(.5,-90,.5,-55)
+frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,35)
+title.BackgroundTransparency = 1
+title.Text = "NHẢY CAO"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextScaled = true
+title.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(.8,0,0,45)
+button.Position = UDim2.new(.1,0,0,50)
+button.Text = "NHẢY CAO: TẮT"
+button.TextScaled = true
+button.Parent = frame
+
+local on = false
+
+local function update()
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.UseJumpPower = true
+		hum.JumpPower = on and 150 or 50
+	end
+end
+
+button.MouseButton1Click:Connect(function()
+	on = not on
+	button.Text = on and "NHẢY CAO: BẬT" or "NHẢY CAO: TẮT"
+	update()
+end)
+
+player.CharacterAdded:Connect(function()
+	task.wait(1)
+	update()
+end)
+
+update()
