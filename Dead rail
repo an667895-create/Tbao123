@@ -1,0 +1,89 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local enabled = false
+local walls = {}
+
+local function removeWalls()
+	for _, wall in ipairs(walls) do
+		if wall and wall.Parent then
+			wall:Destroy()
+		end
+	end
+	table.clear(walls)
+end
+
+local function createWalls()
+	removeWalls()
+	local char = player.Character
+	local root = char and char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	local data = {
+		{Vector3.new(0, 0, -6), Vector3.new(14, 10, 1)},
+		{Vector3.new(0, 0, 6), Vector3.new(14, 10, 1)},
+		{Vector3.new(-6, 0, 0), Vector3.new(1, 10, 12)},
+		{Vector3.new(6, 0, 0), Vector3.new(1, 10, 12)}
+	}
+
+	for _, v in ipairs(data) do
+		local wall = Instance.new("Part")
+		wall.Name = "MonsterBarrier"
+		wall.Size = v[2]
+		wall.CFrame = root.CFrame * CFrame.new(v[1])
+		wall.Anchored = true
+		wall.CanCollide = true
+		wall.Transparency = 0.35
+		wall.Parent = workspace
+		table.insert(walls, wall)
+	end
+end
+
+local gui = Instance.new("ScreenGui")
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromOffset(210, 110)
+frame.Position = UDim2.new(0.5, -105, 0.5, -55)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,40)
+title.BackgroundTransparency = 1
+title.Text = "🛡️ Monster Barrier"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextSize = 18
+title.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1,-20,0,50)
+button.Position = UDim2.fromOffset(10,50)
+button.BackgroundColor3 = Color3.fromRGB(170,50,50)
+button.Text = "TẮT"
+button.TextColor3 = Color3.new(1,1,1)
+button.TextSize = 18
+button.Parent = frame
+
+button.Activated:Connect(function()
+	enabled = not enabled
+	if enabled then
+		createWalls()
+		button.Text = "BẬT"
+		button.BackgroundColor3 = Color3.fromRGB(50,170,70)
+	else
+		removeWalls()
+		button.Text = "TẮT"
+		button.BackgroundColor3 = Color3.fromRGB(170,50,50)
+	end
+end)
+
+player.CharacterAdded:Connect(function()
+	task.wait(1)
+	if enabled then
+		createWalls()
+	end
+end)
