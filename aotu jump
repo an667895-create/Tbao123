@@ -1,0 +1,69 @@
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local enabled = false
+local humanoid
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AutoJumpMenu"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromOffset(220, 120)
+frame.Position = UDim2.new(0.5, -110, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "AUTO JUMP"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 20
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.fromOffset(180, 45)
+button.Position = UDim2.fromOffset(20, 60)
+button.BackgroundColor3 = Color3.fromRGB(180, 45, 45)
+button.Text = "AUTO JUMP: OFF"
+button.TextColor3 = Color3.new(1, 1, 1)
+button.TextSize = 15
+button.Font = Enum.Font.GothamBold
+button.Parent = frame
+
+Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+
+local function setupCharacter(character)
+    humanoid = character:WaitForChild("Humanoid")
+end
+
+if player.Character then
+    setupCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(setupCharacter)
+
+button.MouseButton1Click:Connect(function()
+    enabled = not enabled
+    button.Text = enabled and "AUTO JUMP: ON" or "AUTO JUMP: OFF"
+    button.BackgroundColor3 = enabled
+        and Color3.fromRGB(35, 180, 90)
+        or Color3.fromRGB(180, 45, 45)
+end)
+
+RunService.Heartbeat:Connect(function()
+    if enabled and humanoid and humanoid.Health > 0 then
+        if humanoid.FloorMaterial ~= Enum.Material.Air then
+            humanoid.Jump = true
+        end
+    end
+end)
